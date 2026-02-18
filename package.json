@@ -1,0 +1,10 @@
+{
+  "name": "google-auth",
+  "version": "1.0.0",
+  "description": "Appwrite Function to verify Google ID Token and create Appwrite Session",
+  "main": "src/main.js",
+  "dependencies": {
+    "node-appwrite": "^11.0.0",
+    "google-auth-library": "^9.0.0"
+  }
+}
