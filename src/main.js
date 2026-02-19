@@ -1,5 +1,5 @@
 const sdk = require("node-appwrite");
-const { OAuth2Client } = require("google-auth-library");
+const { OAuth2Client } = require("@google-auth-library/nodejs");
 
 /**
  * Appwrite Function: google-auth
@@ -64,13 +64,7 @@ module.exports = async (context) => {
         user = userList.users[0];
       } else {
         // Create new user
-        user = await users.create(
-          sdk.ID.unique(),
-          email,
-          undefined,
-          undefined,
-          name,
-        );
+        user = await users.create(sdk.ID.unique(), email, undefined, name);
         // Optionally update prefs with avatar
         if (picture) {
           await users.updatePrefs(user.$id, { avatar: picture });
