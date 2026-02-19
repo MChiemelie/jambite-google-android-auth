@@ -5,6 +5,6 @@
   "main": "src/main.js",
   "dependencies": {
     "node-appwrite": "^11.0.0",
-    "@google-auth-library/nodejs": "^9.0.0"
+    "google-auth-library": "^9.0.0"
   }
 }

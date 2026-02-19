@@ -1,5 +1,5 @@
 const sdk = require("node-appwrite");
-const { OAuth2Client } = require("@google-auth-library/nodejs");
+const { OAuth2Client } = require("google-auth-library");
 
 /**
  * Appwrite Function: google-auth
