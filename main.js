@@ -1,22 +1,15 @@
 const sdk = require("node-appwrite");
 const { OAuth2Client } = require("google-auth-library");
 
-/**
- * Appwrite Function: google-auth
- *
- * Takes a Google ID Token from the client, verifies it with Google,
- * and returns an Appwrite User ID and a Secret to create a session.
- */
 module.exports = async (context) => {
   const client = new sdk.Client();
   const users = new sdk.Users(client);
 
-  // Context environment variables
   const APPWRITE_ENDPOINT =
     process.env.APPWRITE_ENDPOINT || "https://cloud.appwrite.io/v1";
   const APPWRITE_FUNCTION_PROJECT_ID = process.env.APPWRITE_FUNCTION_PROJECT_ID;
-  const APPWRITE_API_KEY = context.req.headers["x-appwrite-key"]; // Injected automatically
-  const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID; // Must be set in Function Variables
+  const APPWRITE_API_KEY = context.req.headers["x-appwrite-key"];
+  const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
   if (!APPWRITE_API_KEY || !GOOGLE_CLIENT_ID) {
     context.error(
@@ -47,36 +40,29 @@ module.exports = async (context) => {
       return context.res.json({ error: "Missing idToken" }, 400);
     }
 
-    // 1. Verify Google Token
     const ticket = await googleClient.verifyIdToken({
       idToken: idToken,
       audience: GOOGLE_CLIENT_ID,
     });
     const { email, name, picture } = ticket.getPayload();
 
-    // 2. Find or Create User
     let user;
     try {
-      // Try to list users by email using queries
       const userList = await users.list([sdk.Query.equal("email", email)]);
 
       if (userList.total > 0) {
         user = userList.users[0];
       } else {
-        // Create new user
         user = await users.create(sdk.ID.unique(), email, null, name);
-        // Optionally update prefs with avatar
         if (picture) {
           await users.updatePrefs(user.$id, { avatar: picture });
         }
       }
     } catch (err) {
-      context.error("User lookup/creation failed: " + err.message);
+      context.error(`User lookup/creation failed: ${err.message}`);
       return context.res.json({ error: "User creation failed" }, 500);
     }
 
-    // 3. Create Restricted Token for Client Session
-    // Use the secret from verification - client can exchange this for a session
     const secret = sdk.ID.unique();
     await users.updateLabel(user.$id, `verified_${Date.now()}`);
 
