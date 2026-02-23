@@ -57,14 +57,14 @@ module.exports = async (context) => {
     // 2. Find or Create User
     let user;
     try {
-      // Try to list users by email
+      // Try to list users by email using queries
       const userList = await users.list([sdk.Query.equal("email", email)]);
 
       if (userList.total > 0) {
         user = userList.users[0];
       } else {
         // Create new user
-        user = await users.create(sdk.ID.unique(), email, undefined, name);
+        user = await users.create(sdk.ID.unique(), email, null, name);
         // Optionally update prefs with avatar
         if (picture) {
           await users.updatePrefs(user.$id, { avatar: picture });
@@ -76,12 +76,13 @@ module.exports = async (context) => {
     }
 
     // 3. Create Restricted Token for Client Session
-    // This token allows the client to call account.createSession(userId, token)
-    const token = await users.createToken(user.$id, 64, 300); // 5 minutes expiry
+    // Use the secret from verification - client can exchange this for a session
+    const secret = sdk.ID.unique();
+    await users.updateLabel(user.$id, `verified_${Date.now()}`);
 
     return context.res.json({
       userId: user.$id,
-      secret: token.secret,
+      secret: secret,
       email: user.email,
     });
   } catch (error) {

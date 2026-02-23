@@ -117,7 +117,7 @@ const session = await account.createSession(userId, secret);
 npm install --save-dev appwrite-cli
 
 # Test the function
-node src/main.js
+node main.js
 ```
 
 ## License
