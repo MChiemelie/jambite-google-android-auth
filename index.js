@@ -10,12 +10,29 @@ const crypto = require('crypto');
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+function resolveEnv(...keys) {
+  for (const k of keys) {
+    if (process.env[k]) return process.env[k];
+  }
+  return undefined;
+}
+
 function makeAppwriteClient() {
+  const endpoint = resolveEnv('APPWRITE_ENDPOINT', 'APPWRITE_FUNCTION_ENDPOINT', 'VITE_APPWRITE_ENDPOINT');
+  const projectId = resolveEnv('APPWRITE_PROJECT_ID', 'APPWRITE_FUNCTION_PROJECT_ID', 'VITE_APPWRITE_PROJECT_ID');
+  const apiKey = resolveEnv('APPWRITE_API_KEY', 'APPWRITE_FUNCTION_API_KEY');
+
+  if (!endpoint || !projectId || !apiKey) {
+    console.error('Appwrite function missing required environment variables:', {
+      endpoint: !!endpoint,
+      projectId: !!projectId,
+      apiKey: !!apiKey,
+    });
+    throw new Error('Appwrite function not configured. Ensure APPWRITE_ENDPOINT/APPWRITE_PROJECT_ID/APPWRITE_API_KEY (or their function equivalents) are set.');
+  }
+
   const client = new sdk.Client();
-  client
-    .setEndpoint(process.env.APPWRITE_ENDPOINT)
-    .setProject(process.env.APPWRITE_PROJECT_ID)
-    .setKey(process.env.APPWRITE_API_KEY);
+  client.setEndpoint(endpoint).setProject(projectId).setKey(apiKey);
   return client;
 }
 
