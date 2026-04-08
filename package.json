@@ -1,10 +1,10 @@
 {
-  "name": "google-auth",
+  "name": "google-oauth-exchange",
   "version": "1.0.0",
-  "description": "Appwrite Function to verify Google ID Token and create Appwrite Session",
-  "main": "main.js",
+  "description": "Appwrite function to exchange Google idToken for Appwrite session credentials",
+  "main": "index.js",
   "dependencies": {
-    "node-appwrite": "^11.0.0",
-    "google-auth-library": "^9.0.0"
+    "google-auth-library": "^9.0.0",
+    "node-appwrite": "^11.0.0"
   }
 }
